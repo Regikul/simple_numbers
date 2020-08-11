@@ -84,5 +84,5 @@ tick(X) -> self() ! {tick, X rem 3}.
 push_number(#ng_producer_state{redis = Redis,
                                n = N,
                                out_queue = Queue}) ->
-    X = random:uniform(N) + 1,
+    X = rand:uniform(N) + 1,
     eredis:q(Redis, ["LPUSH", Queue, X]).
