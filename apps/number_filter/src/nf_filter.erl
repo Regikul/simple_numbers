@@ -52,7 +52,7 @@ handle_info({response, {ok, Value}}, State) ->
     NewState = count_accepted(State),
     case Value of
         undefined -> ok;
-        [_Queue, Binary] when is_binary(Binary) -> process(Binary)
+        [_Queue, Binary] when is_binary(Binary) -> process(Binary, State)
     end,
     {noreply, kick(NewState)};
 handle_info(Info, State) ->
@@ -69,8 +69,13 @@ code_change(_OldVsn, State = #nf_filter_state{}, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
-process(_Binary) ->
-    ok.
+process(Binary, #nf_filter_state{redis = Redis,
+                                 out_queue = OutQueue}) ->
+    Integer = list_to_integer(binary_to_list(Binary)),
+    case primes:verify(Integer) of
+        true -> eredis:q_noreply(Redis, ["SADD", OutQueue, Integer]);
+        false -> ok
+    end.
 
 count_accepted(State = #nf_filter_state{enqueued = Enqueued}) ->
     State#nf_filter_state{enqueued = Enqueued - 1}.
