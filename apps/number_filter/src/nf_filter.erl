@@ -52,7 +52,7 @@ handle_info({response, {ok, Value}}, State) ->
     NewState = count_accepted(State),
     case Value of
         undefined -> ok;
-        Binary when is_binary(Binary) -> process(Binary)
+        [_Queue, Binary] when is_binary(Binary) -> process(Binary)
     end,
     {noreply, kick(NewState)};
 handle_info(Info, State) ->
@@ -82,7 +82,7 @@ kick(State = #nf_filter_state{batch_size = BatchSize,
                               redis = Redis}) ->
     case Enqueued =< KickSize of
         true ->
-            Batch = lists:duplicate(BatchSize - Enqueued, ["RPOP", InQueue]),
+            Batch = lists:duplicate(BatchSize - Enqueued, ["BRPOP", InQueue, 5]),
             lists:foreach(fun(Command) -> eredis:q_async(Redis, Command) end, Batch),
             State#nf_filter_state{enqueued = BatchSize};
         false -> State
