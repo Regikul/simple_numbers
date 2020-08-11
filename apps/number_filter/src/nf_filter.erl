@@ -48,13 +48,6 @@ handle_cast(Request, State = #nf_filter_state{}) ->
     lager:error("unknown cast ~p", [Request]),
     {noreply, State}.
 
-handle_info({kick}, State = #nf_filter_state{batch_size = Size,
-                                             enqueued = Enqueued,
-                                             in_queue = InQueue,
-                                             redis = Redis}) ->
-    Batch = lists:duplicate(Size - Enqueued, ["RPOP", InQueue]),
-    lists:foreach(fun(Command) -> eredis:q_async(Redis, Command) end, Batch),
-    {noreply, State};
 handle_info({response, {ok, Value}}, State) ->
     NewState = count_accepted(State),
     case Value of
