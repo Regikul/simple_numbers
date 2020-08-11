@@ -1,0 +1,10 @@
+{"1.1.0",
+[{<<"eredis">>,{pkg,<<"eredis">>,<<"1.2.0">>},0},
+ {<<"goldrush">>,{pkg,<<"goldrush">>,<<"0.1.9">>},1},
+ {<<"lager">>,{pkg,<<"lager">>,<<"3.8.0">>},0}]}.
+[
+{pkg_hash,[
+ {<<"eredis">>, <<"0B8E9CFC2C00FA1374CD107EA63B49BE08D933DF2CF175E6A89B73DD9C380DE4">>},
+ {<<"goldrush">>, <<"F06E5D5F1277DA5C413E84D5A2924174182FB108DABB39D5EC548B27424CD106">>},
+ {<<"lager">>, <<"3402B9A7E473680CA179FC2F1D827CAB88DD37DD1E6113090C6F45EF05228A1C">>}]}
+].

@@ -1,0 +1,17 @@
+{application, number_generator,
+ [{description, "generate numbers and put then into a Redis queue"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {number_generator_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    lager,
+    eredis
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.

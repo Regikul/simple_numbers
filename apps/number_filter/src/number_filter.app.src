@@ -1,0 +1,17 @@
+{application, number_filter,
+ [{description, "fetch numbers from a Redis and put simple numbers to a queue"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {number_filter_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    lager,
+    eredis
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.
