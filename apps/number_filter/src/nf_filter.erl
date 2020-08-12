@@ -59,7 +59,8 @@ handle_info(Info, State) ->
     lager:error("unknown info ~p", [Info]),
     {noreply, State}.
 
-terminate(_Reason, _State = #nf_filter_state{}) ->
+terminate(_Reason, _State = #nf_filter_state{redis = Redis}) ->
+    eredis:stop(Redis),
     ok.
 
 code_change(_OldVsn, State = #nf_filter_state{}, _Extra) ->

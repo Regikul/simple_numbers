@@ -47,10 +47,12 @@ init([]) ->
     tick(0),
     {ok, State}.
 
-handle_call(_Request, _From, State = #ng_producer_state{}) ->
+handle_call(Request, _From, State = #ng_producer_state{}) ->
+    lager:error("unknown call ~p", [Request]),
     {reply, ok, State}.
 
-handle_cast(_Request, State = #ng_producer_state{}) ->
+handle_cast(Request, State = #ng_producer_state{}) ->
+    lager:error("unknown cast ~p", [Request]),
     {noreply, State}.
 
 handle_info({tick, T}, State = #ng_producer_state{since = Since}) ->
@@ -67,9 +69,13 @@ handle_info({tick, T}, State = #ng_producer_state{since = Since}) ->
         false ->
             tick(T),
             {noreply, State}
-    end.
+    end;
+handle_info(Info, State) ->
+    lager:error("unknown info ~p", [Info]),
+    {noreply, State}.
 
-terminate(_Reason, _State = #ng_producer_state{}) ->
+terminate(_Reason, _State = #ng_producer_state{redis = Redis}) ->
+    eredis:stop(Redis),
     ok.
 
 code_change(_OldVsn, State = #ng_producer_state{}, _Extra) ->
@@ -85,4 +91,4 @@ push_number(#ng_producer_state{redis = Redis,
                                n = N,
                                out_queue = Queue}) ->
     X = rand:uniform(N) + 1,
-    eredis:q(Redis, ["LPUSH", Queue, X]).
+    eredis:q_noreply(Redis, ["LPUSH", Queue, X]).
