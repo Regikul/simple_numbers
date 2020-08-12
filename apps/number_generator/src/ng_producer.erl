@@ -1,5 +1,12 @@
 -module(ng_producer).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% This module tries to produce 3 numbers each millisec
+%%% to be as accurate as possible (CPU will be sacrificed)
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -behaviour(gen_server).
 
 -export([start_link/0]).
