@@ -30,6 +30,16 @@ To assemble release run:
 
     $ rebar3 release -n $RELEASE_NAME
 
+Run
+-----
+
+    $ _build/default/rel/allinone/bin/allinone start
+
+or
+
+    $ _build/default/rel/filter/bin/filter start
+    $ _build/default/rel/generator/bin/generator start
+
 Configuration
 -----
 
