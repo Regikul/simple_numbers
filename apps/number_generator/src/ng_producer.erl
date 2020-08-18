@@ -17,6 +17,7 @@
 -define(NOW, erlang:monotonic_time(microsecond)).
 -define(TICK, 333).
 -define(XTICK, 334).
+-define(NO_CONNECTION_DELAY, 500).
 
 -include_lib("common/include/common.hrl").
 
@@ -24,7 +25,8 @@
     redis :: pid(),
     n :: non_neg_integer(),
     out_queue :: string(),
-    since :: integer()
+    since :: integer(),
+    no_connection :: boolean()
 }).
 
 %%%===================================================================
@@ -43,7 +45,8 @@ init([]) ->
         redis = Redis,
         n = N - 1,
         out_queue = Queue,
-        since = ?NOW
+        since = ?NOW,
+        no_connection = false
     },
     tick(0),
     {ok, State}.
@@ -56,6 +59,27 @@ handle_cast(Request, State = #ng_producer_state{}) ->
     lager:error("unknown cast ~p", [Request]),
     {noreply, State}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% handle case when we have no active redis
+%% connection. Producer will try longer ticks
+%% to save CPU - some kind of 'ping' mode
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+handle_info({response, {ok, _}}, State = #ng_producer_state{no_connection = true}) ->
+    {noreply, State#ng_producer_state{no_connection = false}};
+handle_info({response, {ok, _}}, State) ->
+    {noreply, State};
+handle_info({response, {error, Reason}}, State)
+    when Reason =:= tcp_closed orelse Reason =:= no_connection ->
+    {noreply, State#ng_producer_state{no_connection = true}};
+handle_info({tick, _}, State = #ng_producer_state{no_connection = true}) ->
+    lager:warning("have no connection, trying longer tick period"),
+    push_number(State),
+    long_tick(),
+    {noreply, State#ng_producer_state{since = ?NOW}};
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% normal case, when connection is OK
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 handle_info({tick, T}, State = #ng_producer_state{since = Since}) ->
     Now = ?NOW,
     TimeDiff = case T =:= 2 of
@@ -86,10 +110,11 @@ code_change(_OldVsn, State = #ng_producer_state{}, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
+long_tick() -> erlang:send_after(?NO_CONNECTION_DELAY, self(), {tick, 0}).
 tick(X) -> self() ! {tick, X rem 3}.
 
 push_number(#ng_producer_state{redis = Redis,
                                n = N,
                                out_queue = Queue}) ->
     X = rand:uniform(N) + 1,
-    eredis:q_noreply(Redis, ["LPUSH", Queue, X]).
+    eredis:q_async(Redis, ["LPUSH", Queue, X]).
