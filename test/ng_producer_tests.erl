@@ -6,7 +6,8 @@
 simple_test() ->
     meck:new(eredis, [non_strict]),
     Self = self(),
-    meck:expect(eredis, q, fun (_Pid, _List) -> Self ! {add, 1} end),
+    meck:expect(eredis, q_async, fun (_Pid, _List) -> Self ! {add, 1} end),
+    meck:expect(eredis, stop, fun (Pid) when is_pid(Pid) -> ok end),
     meck:new(common),
     meck:expect(common, start_redis, fun() -> {ok, self()} end),
     meck:new(application, [unstick, passthrough]),
@@ -20,6 +21,9 @@ simple_test() ->
     Elapsed = Now - Since,
     ExpectedMsgCount = 3 * Elapsed div 1000 + (Elapsed rem 1000 div 333),
     ?assert(abs(ExpectedMsgCount - MsgCount) < 10),
+    ?assert(meck:validate(eredis)),
+    ?assert(meck:validate(common)),
+    ?assert(meck:validate(application)),
     meck:unload().
 
 get_env_expect(n) -> {ok, 1000};
