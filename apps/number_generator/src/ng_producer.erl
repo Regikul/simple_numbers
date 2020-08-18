@@ -18,7 +18,6 @@
 -define(NOW, erlang:monotonic_time(microsecond)).
 -define(TICK, 333).
 -define(XTICK, 334).
--define(NO_CONNECTION_DELAY, 500).
 
 -include_lib("common/include/common.hrl").
 

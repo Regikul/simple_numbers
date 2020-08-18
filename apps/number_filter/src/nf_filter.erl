@@ -7,7 +7,8 @@
          code_change/3]).
 
 -define(SERVER, ?MODULE).
--define(NO_CONNECTION_DELAY, 500).
+
+-include_lib("common/include/common.hrl").
 
 -record(nf_filter_state, {
     redis :: pid(),

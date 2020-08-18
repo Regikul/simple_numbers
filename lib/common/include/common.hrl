@@ -4,4 +4,6 @@
 -type maybe(Value) :: Value | undefined.
 -type either(Value, Error) :: {ok, Value} | {error, Error}.
 
+-define(NO_CONNECTION_DELAY, 500).
+
 -endif.
