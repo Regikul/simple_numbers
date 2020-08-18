@@ -3,7 +3,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-simple_test() ->
+generation_rate_test() ->
     meck:new(eredis, [non_strict]),
     Self = self(),
     meck:expect(eredis, q_async, fun (_Pid, _List) -> Self ! {add, 1} end),
