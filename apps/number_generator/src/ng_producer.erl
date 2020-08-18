@@ -3,7 +3,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%
 %%% This module tries to produce 3 numbers each millisec
-%%% to be as accurate as possible (CPU will be sacrificed)
+%%% to be as accurate as possible (CPU time will be
+%%% sacrificed)
 %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
